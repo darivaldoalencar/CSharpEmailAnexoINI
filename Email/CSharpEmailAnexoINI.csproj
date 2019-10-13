@@ -1,0 +1,18 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Mail.dll" Version="3.0.19162.1801" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="Mail">
+      <HintPath>Lib\Mail.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+</Project>
