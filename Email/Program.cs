@@ -1,23 +1,18 @@
-﻿using Limilabs.Client.IMAP;
-using Limilabs.Client.POP3;
-using Limilabs.Mail;
-using Limilabs.Mail.MIME;
+﻿using CSharpEmailAnexoINI;
 using System;
-using System.Collections.Generic;
 using System.IO;
+using System.Runtime.InteropServices.ComTypes;
 
 namespace Email
 {
     class Program
     {
-        //Instalar as DLLs: PM> Install-Package Mail.dll
-        //https://www.limilabs.com/mail        
 
         #region propriedades
         private IniFile iniFile
         {
             get
-            {                
+            {
                 return new IniFile(pathINI);
             }
         }
@@ -25,8 +20,8 @@ namespace Email
         private static string pathINI
         {
             get
-            {                
-                return "C:\\ProjetosWeb\\CSharpEmailAnexoINI\\Email\\configuracoes\\CONFIGURACOES.INI";
+            {
+                return "C:/ProjetosWeb/CSharpEmailAnexoINI/Email/configuracoes/CONFIGURACOES.INI";
             }
         }
 
@@ -35,6 +30,22 @@ namespace Email
             get
             {
                 return iniFile.getTAG("EMAIL");
+            }
+        }
+
+        private bool UseSSL
+        {
+            get
+            {
+                return iniFile.getTAG("SSL").ToUpper() == "SIM";
+            }
+        }
+
+        private int PortaPop3
+        {
+            get
+            {
+                return int.Parse(iniFile.getTAG("PORTAPOP3"));
             }
         }
 
@@ -52,7 +63,7 @@ namespace Email
                 string PathAnexo = iniFile.getTAG("PATHANEXO");
                 if (!PathAnexo[PathAnexo.Length - 1].ToString().Equals("\\"))
                 {
-                    PathAnexo +=  "\\";
+                    PathAnexo += "\\";
                 }
                 CriarPastasAmbiente(PathAnexo);
                 return PathAnexo;
@@ -75,60 +86,8 @@ namespace Email
         }
         #endregion
 
-        #region métodos
-        private void BaixarPop3()
-        {
-            using (Pop3 pop3 = new Pop3())
-            {
-                //pop3.Connect("host sem SSL");  
-                pop3.ConnectSSL(hostPop3);
-                pop3.UseBestLogin(MeuEmaail, MinhaSenha);
 
-                foreach (string uid in pop3.GetAll())
-                {
-                    IMail email = new MailBuilder()
-                        .CreateFromEml(pop3.GetMessageByUID(uid));
-
-                    Console.WriteLine(email.Subject);
-
-                    // salva anexo no disco
-                    foreach (MimeData mime in email.Attachments)
-                    {
-                        mime.Save(string.Concat(PathAnexo, mime.SafeFileName));
-                    }
-                }
-                pop3.Close();
-            }
-
-        }
-
-        public void BaixarImap()
-        {
-            using (Imap imap = new Imap())
-            {
-                //imap.Connect("host sem SSL);   
-                imap.ConnectSSL(hostIMAP);
-                imap.UseBestLogin(MeuEmaail, MinhaSenha);
-
-                imap.SelectInbox();
-                List<long> uids = imap.Search(Flag.All);
-
-                foreach (long uid in uids)
-                {
-                    IMail email = new MailBuilder()
-                        .CreateFromEml(imap.GetMessageByUID(uid));
-
-                    Console.WriteLine(email.Subject);
-
-                    // salva anexo no disco
-                    foreach (MimeData mime in email.Attachments)
-                    {
-                        mime.Save(string.Concat(PathAnexo, mime.SafeFileName));
-                    }
-                }
-            }
-        }        
-
+        #region métodos 
         private bool CriarPastasAmbiente(string pasta)
         {
             try
@@ -139,7 +98,7 @@ namespace Email
                 }
                 return true;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 throw new Exception("Erro: " + ex.Message);
             }
@@ -147,13 +106,30 @@ namespace Email
         #endregion
 
         static void Main(string[] args)
-        {            
-            var p = new Program();
-            
-            //a versão pop3 funciona também
-            //p.BaixarPop3();
+        {
+            Program p = new Program();
+            //EmailLimilabs limabs = new EmailLimilabs()
+            //{
+            //    hostPop3 = p.hostPop3,
+            //    MeuEmaail = p.MeuEmaail,
+            //    MinhaSenha = p.MinhaSenha,
+            //    PathAnexo = p.PathAnexo,
+            //    hostIMAP = p.hostIMAP
+            //};
+            //limabs.BaixarImap();
+            //limabs.BaixarPop3();
 
-            p.BaixarImap();            
+            Emails email = new Emails()
+            {
+                _hostname = p.hostPop3,
+                _port = p.PortaPop3,
+                _useSsl = p.UseSSL,
+                _username = p.MeuEmaail,
+                _password = p.MinhaSenha,
+                _pathAnexo = p.PathAnexo
+            };
+
+            email.DownloadEmail();
         }
     }
 }

@@ -7,6 +7,7 @@
 
   <ItemGroup>
     <PackageReference Include="Mail.dll" Version="3.0.19162.1801" />
+    <PackageReference Include="OpenPop.NET" Version="2.0.6.1120" />
   </ItemGroup>
 
   <ItemGroup>
