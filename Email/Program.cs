@@ -13,17 +13,9 @@ namespace Email
         {
             get
             {
-                return new IniFile(pathINI);
+                return new IniFile();
             }
-        }
-
-        private static string pathINI
-        {
-            get
-            {
-                return "C:/ProjetosWeb/CSharpEmailAnexoINI/Email/configuracoes/CONFIGURACOES.INI";
-            }
-        }
+        }       
 
         private string MeuEmaail
         {

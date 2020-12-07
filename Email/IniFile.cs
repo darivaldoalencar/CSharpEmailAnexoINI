@@ -11,9 +11,9 @@ namespace Email
     {
         public string Path { get; set; }
 
-        public IniFile(string iniPath)
+        public IniFile()
         {
-            Path = iniPath;
+            this.Path = "C:/ProjetosWeb/CSharpEmailAnexoINI/Email/configuracoes/CONFIGURACOES.INI"; 
         }
 
         public void WriteValue(string section, string key, string value)
